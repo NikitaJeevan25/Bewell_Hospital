@@ -1,0 +1,285 @@
+version: 2
+
+models:
+  - name: psa_hospital_admission
+    description: "PSA Layer - Raw hospital admission data with audit columns"
+    columns:
+      - name: Patient_ID
+        description: "Source patient ID"
+      - name: Patient_Name
+        description: "Patient full name (raw)"
+      - name: Age
+        description: "Patient age (raw)"
+      - name: Gender
+        description: "Patient gender (raw)"
+      - name: City
+        description: "Patient city (raw)"
+      - name: Department
+        description: "Department name (raw)"
+      - name: Doctor_Name
+        description: "Doctor name (raw)"
+      - name: Admission_Date
+        description: "Admission date (raw)"
+      - name: Discharge_Date
+        description: "Discharge date (raw)"
+      - name: Diagnosis
+        description: "Primary diagnosis (raw)"
+      - name: Insurance_Provider
+        description: "Insurance provider (raw)"
+      - name: Insurance_Coverage
+        description: "Insurance coverage amount (raw)"
+      - name: Total_Bill
+        description: "Total bill amount (raw)"
+      - name: Payment_Done
+        description: "Payment done amount (raw)"
+      - name: Payment_Method
+        description: "Payment method (raw)"
+      - name: loaded_at
+        description: "Timestamp when record was loaded"
+      - name: updated_at
+        description: "Timestamp when record was last updated"
+      - name: source_file
+        description: "Name of source file"
+      - name: source_hash
+        description: "Hash of source record for change detection"
+      - name: is_active
+        description: "Active flag (always 1 in PSA)"
+
+  - name: stg_hospital_admission
+    description: "Staging Layer - Standardized hospital admission data with quality checks"
+    columns:
+      - name: Patient_ID_Std
+        description: "Standardized patient ID"
+        tests:
+          - not_null
+          - unique
+      - name: Patient_Name_Std
+        description: "Standardized patient name"
+      - name: Age_Std
+        description: "Validated age (0-120)"
+      - name: Gender_Std
+        description: "Standardized gender (Male/Female/Unknown)"
+      - name: Age_Group
+        description: "Age group category (Child/Adult/Senior)"
+      - name: City_Std
+        description: "Standardized city name"
+      - name: Department_Std
+        description: "Standardized department name"
+      - name: Doctor_Name_Std
+        description: "Standardized doctor name"
+      - name: Diagnosis_Std
+        description: "Standardized diagnosis"
+      - name: Admission_Date_Std
+        description: "Standardized admission date (YYYY-MM-DD)"
+      - name: Discharge_Date_Std
+        description: "Standardized discharge date (YYYY-MM-DD)"
+      - name: Length_of_Stay
+        description: "Days between admission and discharge"
+      - name: Insurance_Provider_Std
+        description: "Standardized insurance provider"
+      - name: Insurance_Coverage_Adj
+        description: "Adjusted insurance coverage (capped at bill)"
+      - name: Total_Bill
+        description: "Total bill amount"
+      - name: Payment_Done
+        description: "Payment done amount"
+      - name: Expected_Payment
+        description: "Expected payment (Bill - Insurance)"
+      - name: Insurance_Ratio
+        description: "Insurance as percentage of bill"
+      - name: Revenue_Category
+        description: "Revenue category (Low/Medium/High)"
+      - name: Payment_Method_Std
+        description: "Standardized payment method"
+      - name: is_invalid_age
+        description: "Flag: Age outside valid range"
+      - name: is_bill_negative
+        description: "Flag: Negative bill amount"
+      - name: is_insurance_exceeds_bill
+        description: "Flag: Insurance > Total Bill"
+      - name: is_payment_mismatch
+        description: "Flag: Payment mismatch detected"
+      - name: is_invalid_date
+        description: "Flag: Discharge before admission"
+      - name: is_uninsured
+        description: "Flag: Patient is uninsured"
+      - name: is_missing_demographics
+        description: "Flag: Missing key demographic data"
+      - name: data_quality_score
+        description: "Overall data quality score (0-1)"
+      - name: source_file
+        description: "Source file name"
+      - name: loaded_at
+        description: "When record was loaded"
+      - name: transformed_at
+        description: "When record was transformed"
+
+  - name: dim_patient
+    description: "Patient Dimension - Unique patient records"
+    columns:
+      - name: dim_patient_id
+        description: "Surrogate key for patient"
+        tests:
+          - not_null
+          - unique
+      - name: patient_source_id
+        description: "Source system patient ID"
+      - name: patient_name_std
+        description: "Patient full name"
+      - name: age_std
+        description: "Patient age"
+      - name: gender_std
+        description: "Patient gender (Male/Female/Unknown)"
+      - name: age_group
+        description: "Age group (Child/Adult/Senior)"
+      - name: city_std
+        description: "Patient city"
+      - name: created_at
+        description: "Record creation timestamp"
+      - name: updated_at
+        description: "Record update timestamp"
+      - name: is_current_record
+        description: "Whether this is current record (SCD Type 2 ready)"
+
+  - name: dim_doctor
+    description: "Doctor Dimension - Healthcare providers"
+    columns:
+      - name: dim_doctor_id
+        description: "Surrogate key for doctor"
+        tests:
+          - not_null
+          - unique
+      - name: doctor_name_std
+        description: "Doctor name"
+      - name: visit_count
+        description: "Total number of visits"
+      - name: created_at
+        description: "Record creation timestamp"
+      - name: updated_at
+        description: "Record update timestamp"
+
+  - name: dim_location
+    description: "Location Dimension - Hospital locations/cities"
+    columns:
+      - name: dim_location_id
+        description: "Surrogate key for location"
+        tests:
+          - not_null
+          - unique
+      - name: city_name
+        description: "City name"
+      - name: patient_count
+        description: "Number of unique patients"
+      - name: created_at
+        description: "Record creation timestamp"
+      - name: updated_at
+        description: "Record update timestamp"
+
+  - name: dim_insurance
+    description: "Insurance Provider Dimension"
+    columns:
+      - name: dim_insurance_id
+        description: "Surrogate key for insurance provider"
+        tests:
+          - not_null
+          - unique
+      - name: insurance_provider
+        description: "Insurance provider name"
+      - name: claim_count
+        description: "Total number of claims"
+      - name: total_coverage
+        description: "Total coverage amount"
+      - name: avg_coverage
+        description: "Average coverage per claim"
+      - name: is_uninsured_flag
+        description: "Flag for uninsured records"
+      - name: created_at
+        description: "Record creation timestamp"
+      - name: updated_at
+        description: "Record update timestamp"
+
+  - name: dim_department
+    description: "Department Dimension - Hospital departments/specialties"
+    columns:
+      - name: dim_department_id
+        description: "Surrogate key for department"
+        tests:
+          - not_null
+          - unique
+      - name: department_name
+        description: "Department name"
+      - name: visit_count
+        description: "Total visits to department"
+      - name: unique_patients
+        description: "Unique patients treated"
+      - name: created_at
+        description: "Record creation timestamp"
+      - name: updated_at
+        description: "Record update timestamp"
+
+  - name: fact_patient_visit
+    description: "Core Fact Table - Patient visits with financial and operational metrics"
+    columns:
+      - name: fact_patient_visit_id
+        description: "Surrogate key for fact record"
+        tests:
+          - not_null
+          - unique
+      - name: dim_patient_id
+        description: "FK to dim_patient"
+      - name: dim_doctor_id
+        description: "FK to dim_doctor"
+      - name: dim_location_id
+        description: "FK to dim_location"
+      - name: dim_insurance_id
+        description: "FK to dim_insurance"
+      - name: dim_department_id
+        description: "FK to dim_department"
+      - name: admission_date
+        description: "Date of hospital admission"
+      - name: discharge_date
+        description: "Date of hospital discharge"
+      - name: admission_date_key
+        description: "Date dimension key (YYYY-MM-DD)"
+      - name: admission_month_key
+        description: "Month dimension key (YYYYMM)"
+      - name: total_bill_amount
+        description: "Total hospital bill"
+      - name: payment_done_amount
+        description: "Amount paid by patient"
+      - name: insurance_coverage_amount
+        description: "Amount covered by insurance"
+      - name: expected_payment_amount
+        description: "Expected patient payment"
+      - name: insurance_ratio
+        description: "Insurance as % of bill"
+      - name: length_of_stay_days
+        description: "Number of days in hospital"
+      - name: revenue_category
+        description: "Revenue category (Low/Medium/High)"
+      - name: age_group
+        description: "Patient age group"
+      - name: gender
+        description: "Patient gender"
+      - name: diagnosis
+        description: "Primary diagnosis"
+      - name: data_quality_score
+        description: "Data quality score (0-1)"
+      - name: is_invalid_age
+        description: "Age validation flag"
+      - name: is_bill_negative
+        description: "Negative bill flag"
+      - name: is_insurance_exceeds_bill
+        description: "Insurance exceeds bill flag"
+      - name: is_payment_mismatch
+        description: "Payment mismatch flag"
+      - name: is_invalid_date
+        description: "Invalid date flag"
+      - name: is_uninsured
+        description: "Uninsured flag"
+      - name: is_missing_demographics
+        description: "Missing demographics flag"
+      - name: created_at
+        description: "Record creation timestamp"
+      - name: updated_at
+        description: "Record update timestamp"
