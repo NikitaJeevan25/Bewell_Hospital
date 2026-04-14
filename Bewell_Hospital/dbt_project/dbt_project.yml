@@ -1,0 +1,45 @@
+
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+name: 'bewell_hospital_dbt'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'bewell_hospital'
+
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+data-paths: ["data"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  bewell_hospital_dbt:
+    materialization: view
+    staging:
+      +materialized: view
+      +schema: stg_hospital
+    psa:
+      +materialized: table
+      +schema: psa_hospital
+    dl3:
+      dimensions:
+        +materialized: table
+        +schema: dl3_hospital
+      facts:
+        +materialized: table
+        +schema: dl3_hospital
+
+vars:
+  # Data Quality Thresholds
+  max_age: 120
+  min_age: 0
+  max_los: 365
+  max_bill_amount: 999999

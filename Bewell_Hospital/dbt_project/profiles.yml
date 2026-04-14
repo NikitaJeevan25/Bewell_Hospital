@@ -1,0 +1,25 @@
+bewell_hospital:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: [account-id]  # e.g., xy12345.east-us-2.azure
+      user: [username]
+      password: [password]
+      role: TRANSFORMER
+      database: BEWELL_HOSPITAL_DB
+      schema: public
+      threads: 4
+      client_session_keep_alive: False
+      warehouse: COMPUTE_WH
+    prod:
+      type: snowflake
+      account: [account-id]
+      user: [username]
+      password: [password]
+      role: TRANSFORMER
+      database: BEWELL_HOSPITAL_PROD
+      schema: public
+      threads: 8
+      client_session_keep_alive: False
+      warehouse: COMPUTE_WH
