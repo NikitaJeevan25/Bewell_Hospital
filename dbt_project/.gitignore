@@ -1,0 +1,39 @@
+# dbt files
+target/
+dbt_packages/
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Credentials
+profiles.yml
+*.password
+.env
+
+# dbt artifacts
+compiled/
+graph.gpickle
+manifest.json
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride

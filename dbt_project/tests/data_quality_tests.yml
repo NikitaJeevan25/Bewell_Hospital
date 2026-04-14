@@ -1,0 +1,66 @@
+# Data Quality Tests
+
+version: 2
+
+tests:
+  # Generic tests
+  - name: no_negative_bills
+    description: "Ensure Total_Bill is never negative"
+    config:
+      meta:
+        code: |
+          select count(*) from {{ ref('stg_hospital_admission') }}
+          where total_bill < 0
+        expected_result: 0
+
+  - name: valid_dates
+    description: "Ensure Admission_Date <= Discharge_Date"
+    config:
+      meta:
+        code: |
+          select count(*) from {{ ref('stg_hospital_admission') }}
+          where admission_date_std > discharge_date_std
+          and discharge_date_std is not null
+        expected_result: 0
+
+  - name: insurance_not_exceeds_bill
+    description: "Ensure Insurance_Coverage <= Total_Bill"
+    config:
+      meta:
+        code: |
+          select count(*) from {{ ref('stg_hospital_admission') }}
+          where insurance_coverage_adj > total_bill
+        expected_result: 0
+
+  - name: valid_age_range
+    description: "Ensure Age is between 0 and 120"
+    config:
+      meta:
+        code: |
+          select count(*) from {{ ref('stg_hospital_admission') }}
+          where age_std < 0 or age_std > 120
+        expected_result: 0
+
+  - name: duplicate_check
+    description: "Check for duplicate patient visits"
+    config:
+      meta:
+        code: |
+          select count(*) from (
+            select patient_id_std, admission_date_std, count(*) as cnt
+            from {{ ref('stg_hospital_admission') }}
+            group by patient_id_std, admission_date_std
+            having count(*) > 1
+          )
+        expected_result: 0
+
+  - name: missing_critical_fields
+    description: "Check for missing critical fields"
+    config:
+      meta:
+        code: |
+          select count(*) from {{ ref('stg_hospital_admission') }}
+          where patient_id_std is null
+          or admission_date_std is null
+          or total_bill is null
+        expected_result: 0

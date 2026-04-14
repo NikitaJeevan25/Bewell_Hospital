@@ -1,0 +1,41 @@
+version: 2
+
+sources:
+  - name: bewell_hospital_raw
+    description: "Raw hospital admission data from input CSV"
+    database: BEWELL_HOSPITAL_DB
+    schema: raw_hospital
+    tables:
+      - name: hospital_management_data
+        description: "Raw hospital management and admission data"
+        columns:
+          - name: Patient_ID
+            description: "Unique patient identifier"
+          - name: Patient_Name
+            description: "Patient full name"
+          - name: Age
+            description: "Patient age in years"
+          - name: Gender
+            description: "Patient gender (M/F/Male/Female)"
+          - name: City
+            description: "Patient city of residence"
+          - name: Department
+            description: "Hospital department"
+          - name: Doctor_Name
+            description: "Name of treating doctor"
+          - name: Admission_Date
+            description: "Date of hospital admission"
+          - name: Discharge_Date
+            description: "Date of hospital discharge"
+          - name: Diagnosis
+            description: "Primary diagnosis"
+          - name: Insurance_Provider
+            description: "Insurance company name"
+          - name: Insurance_Coverage
+            description: "Amount covered by insurance"
+          - name: Total_Bill
+            description: "Total hospital bill amount"
+          - name: Payment_Done
+            description: "Amount paid by patient"
+          - name: Payment_Method
+            description: "Payment method used"

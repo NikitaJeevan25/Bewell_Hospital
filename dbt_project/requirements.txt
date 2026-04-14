@@ -1,0 +1,18 @@
+# dbt and core dependencies
+dbt-snowflake==1.8.0
+dbt-core==1.8.0
+
+# Utilities
+dbt-utils==1.1.1
+
+# Python dependencies
+snowflake-connector-python>=3.0.0
+snowflake-sqlalchemy>=1.5.0
+
+# Development
+pytest==7.4.0
+pytest-cov==4.1.0
+
+# Code quality
+black==23.9.0
+flake8==6.0.0

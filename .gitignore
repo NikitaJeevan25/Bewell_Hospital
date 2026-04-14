@@ -1,0 +1,36 @@
+# dbt
+target/
+dbt_packages/
+logs/
+.dbt/
+
+# Python
+venv/
+venv_*/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Credentials (IMPORTANT!)
+profiles.yml
+dbt_project_creds.json
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+*.tmp
+*.temp
